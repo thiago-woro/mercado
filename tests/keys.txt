@@ -1,0 +1,68 @@
+
+mongodb apikeys
+2UA8hPKKVRrVNEbLeeF0YPWhL3cIDCPnmHXiQtsVLMrQc0Rn1SLNozVcNmTNB3zC
+
+test keys for bubble
+
+nci9sfY7bxC2eRFu1NIK7v1EVGIxBvfL9erCmmFRzv7OOj9eJVWjc5dzTLrqkFLI
+
+
+
+
+--
+nome do projeto
+RISPACER
+
+
+login: 
+
+iisacribeiro@hotmail.com
+
+
+senha: 
+trader4ddr
+
+
+password
+E0eeRkr6oqWd9Ir9
+
+
+apikeys
+Jr4tBOKzszYGFwh0t850wlOZ1hNZWulXs8KVPV78Lt76xKHAN31G2XAxtPWZlqOF
+
+
+example api call
+
+Server side:
+
+curl --location --request POST 'https://sa-east-1.aws.data.mongodb-api.com/app/data-hxowz/endpoint/data/v1/action/findOne' \
+--header 'Content-Type: application/json' \
+--header 'Access-Control-Request-Headers: *' \
+--header 'api-key: Jr4tBOKzszYGFwh0t850wlOZ1hNZWulXs8KVPV78Lt76xKHAN31G2XAxtPWZlqOF' \
+--data-raw '{
+    "collection":"products",
+    "database":"products",
+    "dataSource":"mercado",
+    "projection": {"_id": 1}
+}'
+
+
+
+Client Side:
+
+
+curl --location --request POST 'https://sa-east-1.aws.data.mongodb-api.com/app/data-hxowz/endpoint/data/v1/action/findOne' \
+--header 'Content-Type: application/json' \
+--header 'Access-Control-Request-Headers: *' \
+--header 'Authorization: Bearer <ACCESS_TOKEN>' \
+--data-raw '{
+    "collection":"products",
+    "database":"products",
+    "dataSource":"mercado",
+    "projection": {"_id": 1}
+}'
+
+
+
+
+https://www.giassi.com.br/_v/segment/graphql/v1?workspace=master&maxAge=short&appsEtag=remove&domain=store&locale=pt-BR&__bindingId=02820f84-cc22-45d2-a290-723c585cca4f&operationName=productSearchV3&variables=%7B%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%225582a05af7ee7b8a43406c6041335d5e4f0a6eea4a16f4bef9d2599218766e82%22%2C%22sender%22%3A%22vtex.store-resources%400.x%22%2C%22provider%22%3A%22vtex.search-graphql%400.x%22%7D%2C%22variables%22%3A%22eyJoaWRlVW5hdmFpbGFibGVJdGVtcyI6ZmFsc2UsInNrdXNGaWx0ZXIiOiJGSVJTVF9BVkFJTEFCTEUiLCJzaW11bGF0aW9uQmVoYXZpb3IiOiJkZWZhdWx0IiwiaW5zdGFsbG1lbnRDcml0ZXJpYSI6Ik1BWF9XSVRIT1VUX0lOVEVSRVNUIiwicHJvZHVjdE9yaWdpblZ0ZXgiOmZhbHNlLCJtYXAiOiJjLGMsYyIsInF1ZXJ5IjoibWVyY2VhcmlhL2FjdWNhci9jcmlzdGFsIiwib3JkZXJCeSI6Ik9yZGVyQnlTY29yZURFU0MiLCJmcm9tIjowLCJ0byI6NDcsInNlbGVjdGVkRmFjZXRzIjpbeyJrZXkiOiJjIiwidmFsdWUiOiJtZXJjZWFyaWEifSx7ImtleSI6ImMiLCJ2YWx1ZSI6ImFjdWNhciJ9LHsia2V5IjoiYyIsInZhbHVlIjoiY3Jpc3RhbCJ9XSwiZmFjZXRzQmVoYXZpb3IiOiJTdGF0aWMiLCJjYXRlZ29yeVRyZWVCZWhhdmlvciI6ImRlZmF1bHQiLCJ3aXRoRmFjZXRzIjpmYWxzZSwidmFyaWFudCI6IiJ9%22%7D
