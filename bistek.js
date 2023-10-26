@@ -26,31 +26,17 @@ async function scrapeCategory(categoryURL, page) {
 		page.setDefaultNavigationTimeout(360000);
 		console.log(`\n\n⏳ loading: ${categoryURL}`);
 
+
+		// Navigate to the category URL
+		await page.goto(baseurl + "?cep=" + zipCode);
+		await page.waitForTimeout(900); // Wait for 4.3 seconds (4300 milliseconds)
+
+
 		// Navigate to the category URL
 		await page.goto(baseurl + categoryURL);
 		await page.waitForTimeout(900); // Wait for 4.3 seconds (4300 milliseconds)
 
 
-		//deal with zipcode
-		console.log(`\n waiting for zipcode`);
-
-		 // Wait for the zip code input field to appear
-		 await page.waitForSelector("#zipcode-id");
-		console.log(`\n found`);
-
-
-		   // Fill the zip code input field
-		   await page.type("#zipcode-id", zipCode);
-		console.log(`\n digitou o cep corretamente, enviando..`);
-
-
-		   // Click the "OK" button to submit the zip code
-		   await page.click("#submit-zipcode");
-		   
-		console.log(`\n waiting......`);
-   
-		   // Wait for the page to load after submitting the zip code
-		   await page.waitForTimeout(2000); // Adjust the waiting time as needed
 		console.log(`\n continuing`);
    
 
