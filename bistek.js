@@ -22,40 +22,46 @@ async function removeDuplicates() {
 
 async function scrapeCategory(categoryURL, page) {
 	try {
-		const zipCode = 88036310
+		const zipCode = "88036310";
 		page.setDefaultNavigationTimeout(360000);
 		console.log(`\n\n⏳ loading: ${categoryURL}`);
-
-
-		// Navigate to the category URL
-		await page.goto(baseurl + "?cep=" + zipCode);
-		await page.waitForTimeout(900); // Wait for 4.3 seconds (4300 milliseconds)
-
 
 		// Navigate to the category URL
 		await page.goto(baseurl + categoryURL);
 		await page.waitForTimeout(900); // Wait for 4.3 seconds (4300 milliseconds)
 
 
+		//deal with zipcode
+		console.log(`\n\n waiting for zipcode`);
+
+		 // Wait for the zip code input field to appear
+		 await page.waitForSelector("#zipcode-id");
+		console.log(`\n found`);
+
+// Define a typing delay in milliseconds (e.g., 100 milliseconds)
+const typingDelay = 100;
+
+	// Fill the zip code input field with a typing delay
+await page.type("#zipcode-id", "88036", { delay: typingDelay });
+await page.type("#zipcode-id", "310", { delay: typingDelay });
+
+
+		console.log(`\n digitou o cep corretamente, enviando..`);
+
+
+		   // Click the "OK" button to submit the zip code
+		   await page.click("#submit-zipcode");
+		   
+		console.log(`\n waiting......`);
+   
+		   // Wait for the page to load after submitting the zip code
+		   await page.waitForTimeout(2000); // Adjust the waiting time as needed
 		console.log(`\n continuing`);
    
 
 		//await autoScroll(page);
 
-		let loadMoreButtonExists = true;
-		while (loadMoreButtonExists) {
-			const loadMoreButton = await page.$(".button.button-default.ajax-pagination.see-more");
-
-			if (loadMoreButton) {
-				console.log('Clicking "See more" button to load more products.');
-				await loadMoreButton.click();
-				await page.waitForTimeout(800); // Wait for 3 seconds (adjust as needed)
-				await autoScroll(page);
-			} else {
-				loadMoreButtonExists = false;
-			}
-		}
-		console.log(`finished navigation ok`);
+	
 
 		// Wait for a specific element to ensure the page is fully loaded
 		await page.waitForSelector(".col-xs-12.col-sm-6.col-lg-4.product-list-item");
