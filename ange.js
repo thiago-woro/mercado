@@ -1,5 +1,6 @@
 const puppeteer = require("puppeteer");
 const {getDate} = require("./getdate.js");
+const {compareAndSaveToDatabase} = require("./saveToDatabase.js");
 const {autoScroll} = require("./autoscroll.js");
 
 let categoriesURLs = [
@@ -113,7 +114,7 @@ async function scrapeCategory(categoryURL, page) {
 		console.log(` \n\n⏳ loading: ${categoryURL}`);
 
 		// Navigate to the category URL
-		await page.goto(categoryURL + "?Nrpp=9");
+		await page.goto(categoryURL + "?Nrpp=9");  
 		//await page.waitForNavigation(); // Wait for the navigation to complete
     console.log(`finished navigation ok`);
 
@@ -239,5 +240,7 @@ function addProductDetails(products) {
 
   // Add the "mercado" property to each product
   extractedProducts = addProductDetails(extractedProducts);
+  console.log(extractedProducts);
+
 
 })();

@@ -3,18 +3,22 @@
 
 ❌  conferir que cada produto obj use campos em comum, com os mesmos nomes. 
 ❌  usar arquivo comum para GET products, e comparar produtos, e subir atualizar no banco de dados
-❌  Cooper scraping
 ❌  Giassi scraping 
 ❌  Bistek scraping 
-❌  
-❌  
+❌  pegar todos os links de categorias do cooper
 ❌  Adicionar data e mercado em todos os produtos
-❌  
-❌  
-❌  
 
+
+
+
+✅   usar getDate em todos
+✅   usar database em todos para subir arquivos
 ✅   angeloni - scraping OK 
 ✅   Atacadao - scraping OK 
+✅   Cooper scraping OK
+✅   Fort scraping OK
+
+
 
 
 let categoriesURLs = [
