@@ -1,4 +1,5 @@
 // Import necessary libraries and functions
+//não utiliza o puppeteer para o scraping, o simples fetch na página já pega os produtos
 const axios = require("axios");
 const {getDate} = require("./getdate.js");
 const {connectToDatabase, saveToMongoDB} = require("./database.js");
@@ -47,7 +48,7 @@ async function fetchData(categoryNumberParameter, from, to) {
 	let baseURL = `https://www.deliveryfort.com.br/api/catalog_system/pub/products/search?fq=C:/${categoryNumberParameter}/&PS=32&sl=067e6192-faba-4687-b9eb-73ab7ac0848f&cc=32&sm=0&PageNumber=1&_from=${from}&_to=${to}`;
 
 	// Initialize an array to store scraped products
-	let bistekScrapedProducts = [];
+	let scrapedProducts = [];
 
 	try {
 		// Send an HTTP GET request to the URL
@@ -74,7 +75,7 @@ async function fetchData(categoryNumberParameter, from, to) {
 				availableQuantity: product.items[0]?.sellers[0]?.commertialOffer?.AvailableQuantity || null,
 			}));
 			// Concatenate products to the main array
-			bistekScrapedProducts = bistekScrapedProducts.concat(products);
+			scrapedProducts = scrapedProducts.concat(products);
 		} else {
 			console.error(`No products found on page, category ${categoryNumberParameter}.`);
 		}
@@ -82,7 +83,7 @@ async function fetchData(categoryNumberParameter, from, to) {
 		console.error(`Error fetching data for category ${categoryNumberParameter}`, error);
 	}
 
-	return bistekScrapedProducts;
+	return scrapedProducts;
 }
 
 // Start scraping for all categories
