@@ -25,46 +25,35 @@ async function scrapeCategory(categoryURL, page) {
 		const zipCode = "88036310";
 		page.setDefaultNavigationTimeout(360000);
 		console.log(`\n\n⏳ loading: ${categoryURL}`);
-
 		// Navigate to the category URL
 		await page.goto(baseurl + categoryURL);
-		await page.waitForTimeout(900); // Wait for 4.3 seconds (4300 milliseconds)
-
-
+		await page.waitForTimeout(100);
 		//deal with zipcode
 		console.log(`\n\n waiting for zipcode`);
-
-		 // Wait for the zip code input field to appear
-		 await page.waitForSelector("#zipcode-id");
+		// Wait for the zip code input field to appear
+		await page.waitForSelector("#zipcode-id");
 		console.log(`\n found`);
-
-// Define a typing delay in milliseconds (e.g., 100 milliseconds)
-const typingDelay = 100;
-
-	// Fill the zip code input field with a typing delay
-await page.type("#zipcode-id", "88036", { delay: typingDelay });
-await page.type("#zipcode-id", "310", { delay: typingDelay });
-
-
+		const typingDelay = 100;
+		// Fill the zip code input field with a typing delay
+		await page.type("#zipcode-id", "88036", {delay: typingDelay});
+		await page.type("#zipcode-id", "310", {delay: typingDelay});
 		console.log(`\n digitou o cep corretamente, enviando..`);
-
-
-		   // Click the "OK" button to submit the zip code
-		   await page.click("#submit-zipcode");
-		   
+		// Click the "OK" button to submit the zip code
+		await page.click("#submit-zipcode");
 		console.log(`\n waiting......`);
-   
-		   // Wait for the page to load after submitting the zip code
-		   await page.waitForTimeout(2000); // Adjust the waiting time as needed
-		console.log(`\n continuing`);
-   
+		// Wait for the page to load after submitting the zip code
+		await page.waitForTimeout(800); // Adjust the waiting time as needed
+		await page.goto("https://www.bistek.com.br/bebidas.html?p=2");
+		await page.waitForTimeout(900);
 
-		//await autoScroll(page);
+		console.log(`\n scrolling down`);
 
-	
+		await autoScroll(page);
+
+		console.log(`\n waiting for products`);
 
 		// Wait for a specific element to ensure the page is fully loaded
-		await page.waitForSelector(".col-xs-12.col-sm-6.col-lg-4.product-list-item");
+		await page.waitForSelector(".products.list.items.product-items");
 
 		console.log(`Products loaded ok\n\n\n`);
 
@@ -72,41 +61,27 @@ await page.type("#zipcode-id", "310", { delay: typingDelay });
 			const products = [];
 
 			// Find all product containers
-			const productContainers = await page.$$(".product-variation");
+			const productContainers = await page.$$(".item.product.product-item");
+			console.log("got " + productContainers.length + " products");
 
 			// Iterate through each product container and extract information
 			for (const productContainer of productContainers) {
 				const product = {};
 
 				// Extract product name
-				product.name = await productContainer.$eval(".product-variation__name", (a) => a.textContent.trim());
+				product.name = await productContainer.$eval(".product.name.product-item-name a", (a) => a.textContent.trim());
 
 				// Extract the image URL
-				product.imageUrl = await productContainer.$eval("img.product-variation__image", (img) => img.getAttribute("src"));
+				product.imageUrl = await productContainer.$eval("img.product-image-photo", (img) => img.getAttribute("src"));
 
 				// Extract product link
-				product.productLink = await productContainer.$eval("a.product-variation__image-container", (a) => a.getAttribute("href"));
+				product.productLink = await productContainer.$eval(".product.name.product-item-name a", (a) => a.getAttribute("href"));
 
 				// Extract prices
-				const priceElement = await productContainer.$(".product-variation__price");
+				const priceElement = await productContainer.$(".price-final_price .price");
 
 				// Extract product price
-				product.price = await productContainer.$eval(".product-variation__final-price", (span) => span.textContent.trim());
-
-				//product.priceCooper = await productContainer.$eval(".product-variation__cooper-price", (span) => span.textContent.trim());
-
-
-				// Check if cooperPrice exists
-				const cooperPriceElement = await priceElement.$(".product-variation__cooper-price");
-				if (cooperPriceElement) {
-					const cooperPrice = await cooperPriceElement.$eval("span", (span) => span.textContent.trim());
-					product.cooperPrice = parseFloat(cooperPrice.replace("R$", "").trim());
-				} else {
-					product.cooperPrice = null; // Set to null if cooperPrice is not found
-				}
-
-
-
+				product.price = await page.evaluate((priceElement) => priceElement.textContent, priceElement);
 
 				// Add the product to the array
 				products.push(product);
