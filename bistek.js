@@ -5,29 +5,27 @@ const {autoScroll} = require("./autoscroll.js");
 
 let extractedProducts = []; // Global variable to store extracted products
 let baseurl = "https://www.bistek.com.br/";
-let categoriesURLs = ["mercearia"];
+let categoriesURLs = ["mercearia", "bebidas", "carnes"];
+const zipCode = "88036310";
+
+
 
 async function setupBrowser() {
 	const browser = await puppeteer.launch({headless: false, slowMo: 0, devtools: false});
 	const page = await browser.newPage();
 	await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.71 Safari/537.36");
 	await page.setViewport({width: 1303, height: 980});
-	page.setDefaultNavigationTimeout(600000);
-	return {browser, page};
-}
+	page.setDefaultNavigationTimeout(6000);
 
-async function removeDuplicates() {
-	extractedProducts = extractedProducts.filter((product, index, self) => index === self.findIndex((p) => p.name === product.name));
-}
 
-async function scrapeCategory(categoryURL, page) {
-	try {
-		const zipCode = "88036310";
-		page.setDefaultNavigationTimeout(360000);
-		console.log(`\n\n⏳ loading: ${categoryURL}`);
+
+	///
+
+
+		console.log(`\n setup...`);
 		// Navigate to the category URL
-		await page.goto(baseurl + categoryURL);
-		await page.waitForTimeout(100);
+		await page.goto("https://www.bistek.com.br/carnes.html");
+		//await page.waitForTimeout(100);
 		//deal with zipcode
 		console.log(`\n\n waiting for zipcode`);
 		// Wait for the zip code input field to appear
@@ -40,11 +38,29 @@ async function scrapeCategory(categoryURL, page) {
 		console.log(`\n digitou o cep corretamente, enviando..`);
 		// Click the "OK" button to submit the zip code
 		await page.click("#submit-zipcode");
+
+
+
+
+	return {browser, page};
+
+
+
+}
+
+async function removeDuplicates() {
+	extractedProducts = extractedProducts.filter((product, index, self) => index === self.findIndex((p) => p.name === product.name));
+}
+
+async function scrapeCategory(categoryURL, page) {
+	try {
+		const pageNumber = 1
+		
 		console.log(`\n waiting......`);
 		// Wait for the page to load after submitting the zip code
 		await page.waitForTimeout(800); // Adjust the waiting time as needed
-		await page.goto("https://www.bistek.com.br/bebidas.html?p=2");
-		await page.waitForTimeout(900);
+		await page.goto(`https://www.bistek.com.br/${categoryURL}.html?p=${pageNumber}&product_list_limit=36`);
+		await page.waitForTimeout(2900);
 
 		console.log(`\n scrolling down`);
 
