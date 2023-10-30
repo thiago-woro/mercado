@@ -42,18 +42,22 @@ async function setupBrowser() {
 	return {browser, page};
 }
 
-async function removeDuplicates() {
-	extractedProducts = extractedProducts.filter((product, index, self) => index === self.findIndex((p) => p.name === product.name));
-}
+
 
 async function scrapeCategory(categoryURL, page) {
-	try {
-		const pageNumber = 1;
+    const maxPageNumber = 8;
 
-		console.log(`\n waiting......`);
-		// Wait for the page to load after submitting the zip code
-		await page.waitForTimeout(800); // Adjust the waiting time as needed
-		await page.goto(`https://www.bistek.com.br/${categoryURL}.html?p=${pageNumber}&product_list_limit=36`);
+	try {
+
+		for (let pageNumber = 1; pageNumber <= maxPageNumber; pageNumber++) {
+            console.log(`\nScraping page ${pageNumber} for category: ${categoryURL}`);
+            
+            // Construct the URL for the current page
+            const currentURL = `https://www.bistek.com.br/${categoryURL}.html?p=${pageNumber}&product_list_limit=36`;
+            
+            // Navigate to the current page
+            await page.goto(currentURL);
+
 		await page.waitForTimeout(2900);
 
 		console.log(`\n scrolling down`);
@@ -66,7 +70,8 @@ async function scrapeCategory(categoryURL, page) {
 
 		if (noProductsFound) {
 			console.log("No products found on this page.");
-			// You can handle this case, such as returning or logging a message.
+			break; // Exit the loop if no products are found on this page
+
 		} else {
 			// Wait for a specific element to ensure the page is fully loaded
 			await page.waitForSelector(".products.list.items.product-items");
@@ -109,14 +114,12 @@ async function scrapeCategory(categoryURL, page) {
 
 		// Call the function to extract product information
 		const productsInCategory = await extractProductInfo();
-
 		// Add the products from this category to the global extractedProducts array
 		extractedProducts = extractedProducts.concat(productsInCategory);
-
 		// Log the accumulated extracted product information
 		console.log("\nTotal products found: ", extractedProducts.length);
-
 	}
+}
 
 
 	} catch (error) {
@@ -164,3 +167,14 @@ function addProductDetails(products) {
 	extractedProducts = addProductDetails(extractedProducts);
 	console.log(extractedProducts);
 })();
+
+
+
+
+
+
+
+
+async function removeDuplicates() {
+	extractedProducts = extractedProducts.filter((product, index, self) => index === self.findIndex((p) => p.name === product.name));
+}
