@@ -9,12 +9,16 @@ const {autoScroll} = require("./autoscroll.js");
 let extractedProducts = []; // Global variable to store extracted products
 let baseurl = "https://www.bistek.com.br/carnes.html?p=8&product_list_limit=36";
 
-const maxPageNumber = 1;
+
+//⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐
+const maxPageNumber = 5;
+const maxProductsToUpload = 9100; // Set your desired limit
+
 
 
 let categoriesURLs = ["mercearia", "bebidas", "carnes", "hortifruti", "frios", "padaria", "saudabilidade", "higiene-e-beleza"];
 
-categoriesURLs = ["mercearia"];   ///for testing only
+//categoriesURLs = ["mercearia"];   ///for testing only
 
 const zipCode = "88036310";
 
@@ -177,7 +181,6 @@ function addProductDetails(products) {
 
 	 // Limit the number of products to be uploaded (13 products) and call compareAndSaveToDatabase
 	 if (extractedProducts.length > 0) {
-		const maxProductsToUpload = 13; // Set your desired limit
 		const productsToUpload = extractedProducts.slice(0, maxProductsToUpload);
 		const i = 1; 
 
