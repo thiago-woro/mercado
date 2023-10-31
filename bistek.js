@@ -1,15 +1,20 @@
 const puppeteer = require("puppeteer");
 const {getDate} = require("./getdate.js");
 const {compareAndSaveToDatabase} = require("./saveToDatabase.js");
+const {connectToDatabase} = require("./database.js");
+
+
 const {autoScroll} = require("./autoscroll.js");
 
 let extractedProducts = []; // Global variable to store extracted products
-let baseurl = "https://www.bistek.com.br/";
+let baseurl = "https://www.bistek.com.br/carnes.html?p=8&product_list_limit=36";
+
+const maxPageNumber = 1;
 
 
-let categoriesURLs = ["mercearia", "bebidas"];
+let categoriesURLs = ["mercearia", "bebidas", "carnes", "hortifruti", "frios", "padaria", "saudabilidade", "higiene-e-beleza"];
 
-//let categoriesURLs = ["mercearia", "bebidas", "carnes"];
+categoriesURLs = ["mercearia"];   ///for testing only
 
 const zipCode = "88036310";
 
@@ -24,7 +29,7 @@ async function setupBrowser() {
 
 	console.log(`\n setup...`);
 	// Navigate to the category URL
-	await page.goto("https://www.bistek.com.br/carnes.html");
+	await page.goto(baseurl);
 	//await page.waitForTimeout(100);
 	//deal with zipcode
 	console.log(`\n\n waiting for zipcode`);
@@ -45,7 +50,6 @@ async function setupBrowser() {
 
 
 async function scrapeCategory(categoryURL, page) {
-    const maxPageNumber = 8;
 
 	try {
 
@@ -62,7 +66,7 @@ async function scrapeCategory(categoryURL, page) {
 
 		console.log(`\n scrolling down`);
 
-		await autoScroll(page);
+		//  await autoScroll(page);
 
 		console.log(`\n waiting for products`);
 
@@ -166,6 +170,21 @@ function addProductDetails(products) {
 	// Add the "mercado" property to each product
 	extractedProducts = addProductDetails(extractedProducts);
 	console.log(extractedProducts);
+
+	console.log("preparing to upload products... ⬆");
+
+
+
+	 // Limit the number of products to be uploaded (13 products) and call compareAndSaveToDatabase
+	 if (extractedProducts.length > 0) {
+		const maxProductsToUpload = 13; // Set your desired limit
+		const productsToUpload = extractedProducts.slice(0, maxProductsToUpload);
+		const i = 1; 
+
+		const client = await connectToDatabase();
+
+		compareAndSaveToDatabase(productsToUpload, client, "Bistek", 5000 );
+	  }
 })();
 
 

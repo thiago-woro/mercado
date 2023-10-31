@@ -1,8 +1,6 @@
 const {MongoClient} = require("mongodb");
-//const uri = "mongodb+srv://thiagoworo:L1UnJ7cEqafma96i@zaploop.g3tioql.mongodb.net/";
 let passwordMongoDB = "E0eeRkr6oqWd9Ir9"
 const uri = `mongodb+srv://iisacribeiro:${passwordMongoDB}@mercado.nhw95wm.mongodb.net/?retryWrites=true&w=majority`;
-
 
 async function connectToDatabase() {
 	const client = new MongoClient(uri);
@@ -28,6 +26,8 @@ async function saveToMongoDB(client, data) {
 		console.log(`client or data is empty`);
 	}
 }
+
+//  connectToDatabase()     uncomment to test connection
 
 module.exports = {
 	connectToDatabase,
