@@ -2,24 +2,24 @@
 
 
 ❌  conferir que cada produto obj use campos em comum, com os mesmos nomes. 
-❌  pegar todos os links de categorias do cooper
-❌  pegar todos os links de categorias do Giassi
-
+❌  pegar todos os links de categorias do Giassi  (13/300)
 ❌  Adicionar data e mercado em todos os produtos
 ❌  adicionar funcao compareAndSaveToDatabase() Fort, angeloni, Cooper
-❌  criar request para countDocuments()
 
 
 
 
 ✅   usar getDate em todos
 ✅   usar database em todos para subir arquivos
+✅   criar request para countDocuments()
 ✅   angeloni - scraping OK 
 ✅   Atacadao - scraping OK 
 ✅   Cooper scraping OK
 ✅   Fort scraping OK
 ✅   Bistek - Upload - OK
 ✅   Giasssi - Upload - OK
+✅   todos os links de categorias do Cooper
+
 
 
 
