@@ -2,12 +2,13 @@
 
 
 ❌  conferir que cada produto obj use campos em comum, com os mesmos nomes. 
-❌  usar arquivo comum para GET products, e comparar produtos, e subir atualizar no banco de dados
-❌  Giassi scraping 
-❌  Bistek scraping 
 ❌  pegar todos os links de categorias do cooper
+❌  pegar todos os links de categorias do Giassi
+
 ❌  Adicionar data e mercado em todos os produtos
-❌  adicionar funcao compareAndSaveToDatabase() Fort, angeloni, Cooper, Giassi
+❌  adicionar funcao compareAndSaveToDatabase() Fort, angeloni, Cooper
+❌  criar request para countDocuments()
+
 
 
 
@@ -18,6 +19,8 @@
 ✅   Cooper scraping OK
 ✅   Fort scraping OK
 ✅   Bistek - Upload - OK
+✅   Giasssi - Upload - OK
+
 
 
 

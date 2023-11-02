@@ -18,7 +18,7 @@ async function saveToMongoDB(client, data) {
 			const result = await collection.insertMany(data);
 			console.log(`${result.insertedCount} products added to MongoDB`);
 		} catch (error) {
-			console.error("Error saving data to MongoDB:", error);
+			console.error("#11 Error saving data to MongoDB, function name saveToMongoDB():\n\n", error);
 			console.log(`returning... ❌`);
 			return;
 		}

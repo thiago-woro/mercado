@@ -4,19 +4,37 @@
 const axios = require('axios');
 const {connectToDatabase, saveToMongoDB} = require("./database.js");
 const {getDate} = require("./getdate.js");
+const fs = require('fs');
 
 
-
-const apiUrl = 'https://www.giassi.com.br/_v/segment/graphql/v1?workspace=master&maxAge=short&appsEtag=remove&domain=store&locale=pt-BR&__bindingId=02820f84-cc22-45d2-a290-723c585cca4f&operationName=productSearchV3&variables=%7B%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%2240b843ca1f7934d20d05d334916220a0c2cae3833d9f17bcb79cdd2185adceac%22%2C%22sender%22%3A%22vtex.store-resources%400.x%22%2C%22provider%22%3A%22vtex.search-graphql%400.x%22%7D%2C%22variables%22%3A%22eyJoaWRlVW5hdmFpbGFibGVJdGVtcyI6ZmFsc2UsInNrdXNGaWx0ZXIiOiJGSVJTVF9BVkFJTEFCTEUiLCJzaW11bGF0aW9uQmVoYXZpb3IiOiJkZWZhdWx0IiwiaW5zdGFsbG1lbnRDcml0ZXJpYSI6Ik1BWF9XSVRIT1VUX0lOVEVSRVNUIiwicHJvZHVjdE9yaWdpblZ0ZXgiOmZhbHNlLCJtYXAiOiJjIiwicXVlcnkiOiJtZXJjZWFyaWEiLCJvcmRlckJ5IjoiT3JkZXJCeVNjb3JlREVTQyIsImZyb20iOjAsInRvIjo0Nywic2VsZWN0ZWRGYWNldHMiOlt7ImtleSI6ImMiLCJ2YWx1ZSI6Im1lcmNlYXJpYSJ9XSwiZmFjZXRzQmVoYXZpb3IiOiJTdGF0aWMiLCJjYXRlZ29yeVRyZWVCZWhhdmlvciI6ImRlZmF1bHQiLCJ3aXRoRmFjZXRzIjpmYWxzZSwidmFyaWFudCI6IiJ9%22%7D';
 
 // Define a global variable array to store the products
 let giassiScrapedProducts = [];
 let databaseProducts = [];
+//const categoriesURLs = require('./helper/giassiCategories.js')
+
+console.log('1 - starting...');
+
+const fileContent = fs.readFileSync('./resource/importantCategories.csv', 'utf-8');
+
+// Split the string into an array using '\n' as the delimiter for rows and remove '\r' characters
+const rows = fileContent.split('\n').map(row => row.replace('\r', ''));
+
+// Filter out empty rows and split each row into an array of columns using ','
+const precategoriesURLS = rows.filter(row => row.trim() !== '').map(row => row.split(','));
+
+// Flatten the nested arrays and remove empty items
+const categoriesURLS = precategoriesURLS.flat().filter(item => item.trim() !== '');
+
+console.log('\n\n\nFound ', categoriesURLS.length, " categories\n\n\n");
+//console.log(flattenedArray);
 
 
-async function fetchData() {
+
+
+async function fetchData(url) {
   try {
-    const response = await axios.get(apiUrl);
+    const response = await axios.get(url);
     const data = response.data;
 
     // Check if products exist in the data
@@ -43,8 +61,7 @@ async function fetchData() {
       giassiScrapedProducts = [...giassiScrapedProducts, ...products];
 
       // Log the filtered product data
-      //console.log(products);
-      console.log('1) products length' + products.length);
+      console.log('1) products length:   ' + products.length);
 
     } else {
       console.error('No products found in the data.');
@@ -54,35 +71,9 @@ async function fetchData() {
   }
 }
 
-
 async function getDatabaseProducts(client) {
-  try {
-    const db = client.db("products");
-    const collection = db.collection("products");
-
-    // Filter and fetch products from the database with mercado: 'Giassi'
-    databaseProducts = await collection.find({ mercado: 'Giassi' }).toArray();
-
-    console.log("2) Got database products", databaseProducts);
-    console.log("Fetched ", databaseProducts.length, " products 📦 \n\n\n");
-
-    // Add a condition to handle when there are 0 products in the database
-    if (databaseProducts.length === 0) {
-      console.log("2b) No products from Giassi market found in the database.");
-      // Handle this case here, e.g., return an empty array or perform other actions.
-      return [];
-    }
-
-    return databaseProducts;
-  } catch (error) {
-    console.error("\nError fetching data from MongoDB:", error);
-    return [];
-  } finally {
-    console.log("\nfinally finished getDatabaseProducts()");
-    // client.close(); // Close the MongoDB connection
-  }
+  // Implement this function to retrieve database products
 }
-
 
 async function compareAndSaveProducts(client) {
   const existingProducts = [];
@@ -90,7 +81,7 @@ async function compareAndSaveProducts(client) {
 
   giassiScrapedProducts.forEach(scrapedProduct => {
     const matchingProduct = databaseProducts.find(dbProduct => dbProduct.productId === scrapedProduct.productId);
-    
+
     if (matchingProduct) {
       existingProducts.push(scrapedProduct);
     } else {
@@ -104,24 +95,24 @@ async function compareAndSaveProducts(client) {
   return existingProducts;
 }
 
-const existingProducts = compareAndSaveProducts();
-console.log("3) Existing Products:", existingProducts.length);
-
-
+// Wrap the code in a for loop to iterate through categoriesURLs
 (async () => {
-  await fetchData();
+  const client = await connectToDatabase(); // Assuming you have a function to connect to the database
 
-  const client = await connectToDatabase();
+  for (let index = 0; index < categoriesURLS.length; index++) {
+    const url = categoriesURLS[index];
+    console.log(`nex Scraping loop: #${index+1}\n`);
+    await fetchData(url);
+  }
 
   // Fetch database products
-  const databaseProducts = await getDatabaseProducts(client);
+  //const databaseProducts = await getDatabaseProducts(client);
 
   // Compare and save products
   const existingProducts = await compareAndSaveProducts(client);
 
-  //console.log("Existing Products:", existingProducts);
   console.log("3) Existing Products:", existingProducts.length);
-
+  console.log("\n\nfinished ok ⭐");
 
   // Close the MongoDB connection
   client.close();
