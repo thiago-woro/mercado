@@ -2,10 +2,15 @@ const {getDate} = require("./getdate.js");
 const {saveToMongoDB} = require("./database.js");
 
 async function compareAndSaveToDatabase(newlyScrapedProducts, client, mercadoName, maxProductsToUpload) {
-	console.log("Imported file saveToDatabase.js");
+	console.log("\n starting saveToDatabase.js");
+	console.log("\n received ", newlyScrapedProducts.length, " products");
+
 
 	// Remove duplicates from newlyScrapedProducts using a Set
 	const uniqueNewlyScrapedProducts = Array.from(new Set(newlyScrapedProducts));
+
+	console.log("\n new set:  ", uniqueNewlyScrapedProducts.length, " products");
+
 
 	const db = client.db("products");
 	const collection = db.collection("products");

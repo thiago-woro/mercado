@@ -1,15 +1,20 @@
 const puppeteer = require("puppeteer");
 const {getDate} = require("./getdate.js");
 const {compareAndSaveToDatabase} = require("./saveToDatabase.js");
+const {connectToDatabase} = require("./database.js");
 const {autoScroll} = require("./autoscroll.js");
 
 let extractedProducts = []; // Global variable to store extracted products
 let baseurl = "https://www.minhacooper.com.br/loja/a.verde-bnu/produto/listar/";
-let categoriesURLs =  [1, 222, 525, 420, 75, 1033, 384, 281, 28, 647, 1145, 482, 464, 428, 503, 431, 421, 439, 458, 1134, 446, 451, 455, 1090, 5, 9, 12, 219, 18, 915, 1112, 40, 950, 60, 228, 126, 142, 165, 1100, 47, 197, 2, 96, 894, 236, 278, 63, 311, 321, 302, 323, 308, 1084, 363, 349, 319, 282, 351, 313, 370, 379, 1076]
+let categoriesURLs = [
+	1, 222, 525, 420, 75, 1033, 384, 281, 28, 647, 1145, 482, 464, 428, 503, 431, 421, 439, 458, 1134, 446, 451, 455, 1090, 5, 9, 12, 219, 18, 915, 1112, 40, 950, 60, 228, 126, 142, 165, 1100, 47, 197, 2, 96, 894, 236, 278, 63, 311, 321, 302, 323, 308, 1084, 363, 349, 319, 282, 351, 313, 370,
+	379, 1076,
+];
 
+//categoriesURLs = [1];
 
 async function setupBrowser() {
-	const browser = await puppeteer.launch({headless: false, slowMo: 0, devtools: false});
+	const browser = await puppeteer.launch({headless: true, slowMo: 0, devtools: false});
 	const page = await browser.newPage();
 	await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.71 Safari/537.36");
 	await page.setViewport({width: 1303, height: 980});
@@ -88,7 +93,7 @@ async function scrapeCategory(categoryURL, page) {
 
 				if (finalPriceElement) {
 					// Extract the price text within the "span" element
-					product.price = await finalPriceElement.evaluate(node => node.textContent.trim());
+					product.price = await finalPriceElement.evaluate((node) => node.textContent.trim());
 					console.log(product.price);
 				}
 
@@ -152,11 +157,8 @@ function addProductDetails(products) {
 		await scrapeCategory(categoryURL, page);
 	}
 
-	// Log the accumulated extracted product information
-	console.log("\nTotal found before removing duplicates: ", extractedProducts.length);
-
 	// Remove duplicates from the extractedProducts array
-	//await removeDuplicates();  //fix product names
+	await removeDuplicates(); //fix product names
 
 	// Log the accumulated extracted product information after removing duplicates
 	console.log("\nTotal products after removing duplicates: ", extractedProducts.length);
@@ -167,4 +169,13 @@ function addProductDetails(products) {
 	// Add the "mercado" property to each product
 	extractedProducts = addProductDetails(extractedProducts);
 	console.log(extractedProducts);
+
+	// Limit the number of products to be uploaded (13 products) and call compareAndSaveToDatabase
+	if (extractedProducts.length > 0) {
+		//const productsToUpload = extractedProducts.slice(0, 5000);
+		const i = 1;
+
+		const client = await connectToDatabase();
+		compareAndSaveToDatabase(extractedProducts, client, "Cooper", 5000);
+	}
 })();
