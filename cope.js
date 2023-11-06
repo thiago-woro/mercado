@@ -11,7 +11,7 @@ let categoriesURLs = [
 	379, 1076,
 ];
 
-//categoriesURLs = [1];
+categoriesURLs = [1];
 
 async function setupBrowser() {
 	const browser = await puppeteer.launch({headless: true, slowMo: 0, devtools: false});
@@ -85,7 +85,7 @@ async function scrapeCategory(categoryURL, page) {
 					// Extract the price text within the "span" element
 					const priceKg = await fractionalDescElement.$eval("span", (span) => span.textContent.trim());
 					product.pricePorQuilo = priceKg;
-					console.log(priceKg);
+					//console.log(priceKg);  //Preço por quilo
 				}
 
 				// Extract the final price within the current product container
@@ -165,10 +165,12 @@ function addProductDetails(products) {
 
 	// Close the browser after all categories have been scraped
 	await browser.close();
+	console.log("\n Scraping OK \n ");
+
 
 	// Add the "mercado" property to each product
 	extractedProducts = addProductDetails(extractedProducts);
-	console.log(extractedProducts);
+	//console.log(extractedProducts);
 
 	// Limit the number of products to be uploaded (13 products) and call compareAndSaveToDatabase
 	if (extractedProducts.length > 0) {
@@ -176,6 +178,6 @@ function addProductDetails(products) {
 		const i = 1;
 
 		const client = await connectToDatabase();
-		compareAndSaveToDatabase(extractedProducts, client, "Cooper", 5000);
+		compareAndSaveToDatabase(extractedProducts, client, "Cooper Água Verde", 5000);
 	}
 })();

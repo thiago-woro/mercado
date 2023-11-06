@@ -5,6 +5,8 @@
 ❌  pegar todos os links de categorias do Giassi  (13/300)
 ❌  Adicionar data e mercado em todos os produtos
 ❌  adicionar funcao compareAndSaveToDatabase() Fort, angeloni, Cooper
+❌  adicionar preco promocional Cooper agua verde
+
 
 
 

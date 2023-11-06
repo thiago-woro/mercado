@@ -1,8 +1,10 @@
-const {MongoClient} = require("mongodb");
-let passwordMongoDB = "E0eeRkr6oqWd9Ir9"
-const uri = `mongodb+srv://iisacribeiro:${passwordMongoDB}@mercado.nhw95wm.mongodb.net/?retryWrites=true&w=majority`;
-
 async function connectToDatabase() {
+	console.log("Connecting.........");
+
+	const {MongoClient} = require("mongodb");
+	let passwordMongoDB = "E0eeRkr6oqWd9Ir9";
+	const uri = `mongodb+srv://iisacribeiro:${passwordMongoDB}@mercado.nhw95wm.mongodb.net/?retryWrites=true&w=majority`;
+
 	const client = new MongoClient(uri);
 	await client.connect();
 	console.log("Connected to MongoDB Atlas ✅");
@@ -33,5 +35,3 @@ module.exports = {
 	connectToDatabase,
 	saveToMongoDB,
 };
-
-
