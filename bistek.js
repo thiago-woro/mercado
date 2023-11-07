@@ -187,7 +187,11 @@ function addProductDetails(products) {
 		const client = await connectToDatabase();
 
 		compareAndSaveToDatabase(productsToUpload, client, "Bistek", 5000 );
+		console.log("\n\n FINISHED ✅✅✅ \n \n");
+
 	  }
+	  process.exit(0);
+
 })();
 
 

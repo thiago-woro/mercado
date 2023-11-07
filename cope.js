@@ -180,4 +180,6 @@ function addProductDetails(products) {
 		const client = await connectToDatabase();
 		compareAndSaveToDatabase(extractedProducts, client, "Cooper Água Verde", 5000);
 	}
+    process.exit(0);
+
 })();

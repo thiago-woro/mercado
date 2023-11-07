@@ -1,15 +1,6 @@
-
-
-
-❌  conferir que cada produto obj use campos em comum, com os mesmos nomes. 
 ❌  pegar todos os links de categorias do Giassi  (13/300)
 ❌  adicionar preco promocional Cooper agua verde
-❌  adicionar funcao compareAndSaveToDatabase() Fort, angeloni
-❌  upload Fort
-❌  upload angeloni
-
-
-
+❌  add db scraping and upload results to mongoDB
 
 
 ✅   usar getDate em todos
@@ -22,25 +13,6 @@
 ✅   Bistek - Upload - OK
 ✅   Giasssi - Upload - OK
 ✅   todos os links de categorias do Cooper
-
-
-
-
-
-
-
-let categoriesURLs = [
-  "https://www.angeloni.com.br/super/c/congelados/_/N-ha9qgj",
-  "https://www.angeloni.com.br/super/c/mercearia/achocolatado-em-po/_/N-1s0nch5"," https://www.angeloni.com.br/super/c/mercearia/adocante/_/N-kon4f2"
-]
-
-
-
-
-https://www.angeloni.com.br/super/c/congelados/_/N-ha9qgj?No=48&Nr=AND%28product.store%3A14%2Cproduct.siteId%3Asuper%2Cprop.product.indexableSuper%3A1%2CNOT%28dim.product.type%3Aproduct-recipe%29%29&Nrpp=48
-
-https://www.angeloni.com.br/super/c/congelados/_/N-ha9qgj?No=96&Nr=AND%28prop.product.indexableSuper%3A1%2CAND%28product.store%3A14%2Cproduct.siteId%3Asuper%2Cprop.product.indexableSuper%3A1%2CNOT%28dim.product.type%3Aproduct-recipe%29%29%2Cproduct.store%3A14%2CNOT%28dim.product.type%3Aproduct-recipe%29%2Cproduct.siteId%3Asuper%29&Nrpp=48
-
-
-480 produtos
-https://www.angeloni.com.br/super/c/congelados/_/N-ha9qgj?Nr=AND%28prop.product.indexableSuper%3A1%2Cproduct.store%3A14%2CAND%28product.store%3A14%2Cproduct.siteId%3Asuper%2Cprop.product.indexableSuper%3A1%2CNOT%28dim.product.type%3Aproduct-recipe%29%29%2Cproduct.siteId%3Asuper%2CNOT%28dim.product.type%3Aproduct-recipe%29%29&Nrpp=480&Ns=dim.product.inStock%7C1%7C%7Cproduct.sales.byTotal%7C1
+✅   upload Fort
+✅   upload angeloni
+✅  conferir que cada produto obj use campos em comum, com os mesmos nomes. 

@@ -21,35 +21,33 @@ let to = 49;
 console.log(`\n\n\n\n Starting new execution... ⭐`);
 
 async function scrapeAllCategories() {
-    console.log(`\n\n started scraping \n`);
-    
-    for (const categoryNumberParameter of categoriesFort) {
-        let pageCounter = 1;
+	console.log(`\n\n started scraping \n`);
 
-        while (pageCounter <= 18) { // Limit to 50 pages
-            // Reset 'from' and 'to' for each page
-            from = (pageCounter - 1) * 50;
-            to = pageCounter * 50 - 1;
+	for (const categoryNumberParameter of categoriesFort) {
+		let pageCounter = 1;
 
-            // Fetch product data for the current category and page range
-            const productsThisRound = await fetchData(categoryNumberParameter, from, to);
+		while (pageCounter <= 18) {
+			// Limit to 50 pages
+			// Reset 'from' and 'to' for each page
+			from = (pageCounter - 1) * 50;
+			to = pageCounter * 50 - 1;
 
-            if (productsThisRound.length > 0) {
-                console.log(`\n\n${productsThisRound.length} products on category ${categoryNumberParameter} - Page: ${pageCounter}\n`);
-                pageCounter++;
-            } else {
-                // If no products found on the current page, move to the next category
-                console.log(`\n\nNo products found on category ${categoryNumberParameter} - Page: ${pageCounter}. Moving to the next category...\n`);
-                break; // Exit the loop and move to the next category
-            }
-        }
-    }
-    console.log(`\n\n finished scraping OK ⭐⭐⭐⭐\nGot ${scrapedProducts.length} products`);
-    sendToUpload();
+			// Fetch product data for the current category and page range
+			const productsThisRound = await fetchData(categoryNumberParameter, from, to);
+
+			if (productsThisRound.length > 0) {
+				console.log(`\n\n${productsThisRound.length} products on category ${categoryNumberParameter} - Page: ${pageCounter}\n`);
+				pageCounter++;
+			} else {
+				// If no products found on the current page, move to the next category
+				console.log(`\n\nNo products found on category ${categoryNumberParameter} - Page: ${pageCounter}. Moving to the next category...\n`);
+				break; // Exit the loop and move to the next category
+			}
+		}
+	}
+	console.log(`\n\n finished scraping OK ⭐⭐⭐⭐\nGot ${scrapedProducts.length} products`);
+	sendToUpload();
 }
-
-
-
 
 // Define a function to fetch product data for a specific category and page range
 async function fetchData(categoryNumberParameter, from, to) {
@@ -81,7 +79,6 @@ async function fetchData(categoryNumberParameter, from, to) {
 			}));
 			// Concatenate products to the main array
 			scrapedProducts.push(...products);
-
 		} else {
 			console.error(`No products found, category ${categoryNumberParameter}\nFrom ${from}  to  ${to} .`);
 		}
@@ -93,9 +90,17 @@ async function fetchData(categoryNumberParameter, from, to) {
 }
 
 async function sendToUpload() {
-	console.log("\n 🅱🅱🅱🅱🅱🅱🅱\nsending to upload...  ", scrapedProducts.length, "\n\n");
-	const client = await connectToDatabase();
-	compareAndSaveToDatabase(scrapedProducts, client, "Fort", 5000);
+	// Limit the number of products to be uploaded (13 products) and call compareAndSaveToDatabase
+	if (scrapedProducts.length > 0) {
+		const i = 1;
+
+		console.log("\n 🅱🅱🅱🅱🅱🅱🅱\nsending to upload...  ", scrapedProducts.length, "\n\n");
+		const client = await connectToDatabase();
+		compareAndSaveToDatabase(scrapedProducts, client, "Fort", 5000);
+		console.log("\n\n FINISHED ✅✅✅ \n \n");
+	}
+
+	process.exit(0);
 }
 
 // Start scraping for all categories

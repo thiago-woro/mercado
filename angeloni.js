@@ -1,7 +1,11 @@
 const puppeteer = require("puppeteer");
 const {getDate} = require("./getdate.js");
+const {connectToDatabase} = require("./database.js");
+
 const {compareAndSaveToDatabase} = require("./saveToDatabase.js");
 const {autoScroll} = require("./autoscroll.js");
+
+//let categoriesURLs = ["https://www.angeloni.com.br/super/c/congelados/_/N-ha9qgj"];  //testing only
 
 let categoriesURLs = [
 	"https://www.angeloni.com.br/super/c/congelados/_/N-ha9qgj",
@@ -77,132 +81,7 @@ let categoriesURLs = [
 	" https://www.angeloni.com.br/super/c/mercearia/granulado/_/N-18jt2v1",
 ];
 
-categoriesURLs = ["https://www.angeloni.com.br/super/c/congelados/_/N-ha9qgj", "https://www.angeloni.com.br/super/c/mercearia/achocolatado-em-po/_/N-1s0nch5"];
-
 let extractedProducts = []; // Global variable to store extracted products
-
-async function setupBrowser() {
-	const browser = await puppeteer.launch({headless: false, slowMo: 0, devtools: false});
-	const page = await browser.newPage();
-
-	// Emulate a browser-like environment
-	await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.71 Safari/537.36");
-	await page.setViewport({width: 1303, height: 980});
-  page.setDefaultNavigationTimeout(600000);
-
-  // Add event listeners to log responses and request failures
-  page.on('response', (response) => {
-    //console.log(`Response URL: ${response.url()}`);
-    //console.log(`Response Status: ${response.status()}`);
-  });
-
-  page.on('requestfailed', (request) => {
-   // console.log(`Request failed: ${request.url()}`);
-  });
-
-  return { browser, page };
-}
-
-async function removeDuplicates() {
-	extractedProducts = extractedProducts.filter((product, index, self) => index === self.findIndex((p) => p.name === product.name));
-}
-
-async function scrapeCategory(categoryURL, page) {
-	try {
-		page.setDefaultNavigationTimeout(360000);
-
-		console.log(` \n\n⏳ loading: ${categoryURL}`);
-
-		// Navigate to the category URL
-		await page.goto(categoryURL + "?Nrpp=9");  
-		//await page.waitForNavigation(); // Wait for the navigation to complete
-    console.log(`finished navigation ok`);
-
-
-		//await page.waitForTimeout(1300);
-
-		// Wait for a specific element to ensure the page is fully loaded
-		await page.waitForSelector(".box-produto");
-		await page.waitForSelector(".box-produto__desc-prod");
-
-		//await autoScroll(page);
-
-		console.log(`Products loaded ok\n\n\n`);
-
-		//fn to extract product info
-		const extractProductInfo = async () => {
-			const products = [];
-
-			// Find all product containers
-			const productContainers = await page.$$(".box-produto");
-
-			// Iterate through each product container and extract information
-			for (const productContainer of productContainers) {
-				const product = {};
-
-				// Check if the product description element exists within the container
-				const descProdElement = await productContainer.$(".box-produto__desc-prod");
-
-				if (!descProdElement) {
-					console.log("Skipping product without '.box-produto__desc-prod'");
-					continue; // Skip this product and continue to the next one
-				}
-
-				// Extract product name
-				product.name = await descProdElement.evaluate((element) => element.textContent.trim());
-
-				// Wait for the image to be present (indicates it's ready for scraping)
-				await page.waitForSelector(".box-produto__content-img img[data-src]");
-				// Extract the image URL from data-src
-				product.imageUrl = await productContainer.$eval(".box-produto__content-img img[data-src]", (img) => img.getAttribute("data-src"));
-
-				// Extract product link
-				product.productLink = await productContainer.$eval(".box-produto__content-img.p-relative a", (a) => a.getAttribute("href"));
-
-				// Check if the product is available (contains the "Produto indisponível" message)
-				const isAvailable = await productContainer.$(".box-produto__indisponivel i");
-				if (isAvailable) {
-					console.log(`${product.name} sem estoque`);
-					product.price = null; // Set price to null or any other value to indicate unavailability
-				} else {
-					// Extract price (combine the two parts)
-					const priceWholeSelector = ".box-produto__preco";
-
-					try {
-						// Extract the price text
-						const priceText = await productContainer.$eval(".box-produto__preco", (span) => span.textContent.trim());
-
-						// Extract the numerical part of the price (excluding 'R$' and ',' characters)
-						const numericalPrice = parseFloat(priceText.replace("R$", "").replace(",", "."));
-
-						// Combine whole and decimal parts to get the complete price
-						product.price = parseFloat(`${numericalPrice}`);
-					} catch (error) {
-						console.error("Error extracting price:", error.message);
-						product.price = null; // Handle the case where the price couldn't be extracted
-					}
-				}
-
-				// Add the product to the array
-				products.push(product);
-			}
-
-			return products;
-		};
-
-		// Call the function to extract product information
-		const productsInCategory = await extractProductInfo();
-
-		// Add the products from this category to the global extractedProducts array
-		extractedProducts = extractedProducts.concat(productsInCategory);
-
-		// Log the accumulated extracted product information
-		console.log("\nTotal products found: ", extractedProducts.length);
-	} catch (error) {
-		console.error("Error while scraping:", error.message);
-		// Continue to the next category URL if there was an error
-	}
-}
 
 function addProductDetails(products) {
 	let updatedHourVar = getDate().dateHour;
@@ -216,31 +95,115 @@ function addProductDetails(products) {
 	}));
 }
 
+async function setupBrowser() {
+	const browser = await puppeteer.launch({headless: false, slowMo: 0, devtools: false});
+	const page = await browser.newPage();
+
+	// Emulate a browser-like environment
+	await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.71 Safari/537.36");
+	await page.setViewport({width: 1303, height: 980});
+	page.setDefaultNavigationTimeout(60000);
+
+	// Add event listeners to log responses and request failures
+	page.on("response", (response) => {
+		// console.log(`Response URL: ${response.url()}`);
+		// console.log(`Response Status: ${response.status()}`);
+	});
+
+	page.on("requestfailed", (request) => {
+		// console.log(`Request failed: ${request.url()}`);
+	});
+
+	return {browser, page};
+}
+
+async function removeDuplicates() {
+	extractedProducts = extractedProducts.filter((product, index, self) => index === self.findIndex((p) => p.name === product.name));
+}
+
+async function scrapeCategory(categoryURL, page) {
+	try {
+		console.log("\nnavigating...");
+		await page.goto(categoryURL, {waitUntil: "domcontentloaded", timeout: 50000});
+
+		console.log("network idle");
+
+		// Define the selector for each product on the page
+		const productSelector = "section.vtex-product-summary-2-x-container";
+
+		// Wait for the product selector to become available on the page
+		await page.waitForSelector(productSelector);
+		console.log("\n found selector...");
+
+		console.log("\nscrolling...");
+		await autoScroll(page); // If you need to scroll down to load more products
+
+		const products = await page.$$eval(productSelector, (productElements) => {
+			return productElements.map((productElement) => {
+				const titleElement = productElement.querySelector(".vtex-product-summary-2-x-productBrand");
+				const priceElement = productElement.querySelector(".vtex-product-price-1-x-currencyInteger");
+				const fractionElement = productElement.querySelector(".vtex-product-price-1-x-currencyFraction");
+				const anchorElement = productElement.querySelector("a");
+				const imgElement = productElement.querySelector("img");
+
+				const name = titleElement ? titleElement.textContent.trim() : "N/A";
+				const price = priceElement && fractionElement ? `${priceElement.textContent.trim()},${fractionElement.textContent.trim()}` : "N/A";
+				const productLink = anchorElement ? anchorElement.getAttribute("href") : "N/A";
+				const imageUrl = imgElement ? imgElement.getAttribute("src") : "N/A";
+
+				return {name, price, productLink, imageUrl};
+			});
+		});
+
+		// Add the products to the extractedProducts array
+		extractedProducts.push(...products);
+
+		//console.log("Extracted products:", products);
+		console.log("Extracted products:", products.length);
+
+	} catch (error) {
+		console.error("Error scraping category:", error);
+	}
+}
+
 //main function loop
 (async () => {
-  const { browser, page } = await setupBrowser(); //starts browser
+	const {browser, page} = await setupBrowser(); //starts browser
 
-  // Loop through the category URLs and run the scraping function for each URL
-  for (const categoryURL of categoriesURLs) {
-    console.log("\n\nStarting scraping for category: ", categoryURL);
-    await scrapeCategory(categoryURL, page);
-  }
-  // Log the accumulated extracted product information
-  console.log("\nTotal found before removing duplicates: ", extractedProducts.length);
+	// Loop through the category URLs and run the scraping function for each URL
+	for (const categoryURL of categoriesURLs) {
+		console.log("\n\nStarting scraping for category: ", categoryURL);
+		await scrapeCategory(categoryURL, page);
+	}
+	// Log the accumulated extracted product information
+	console.log("\nTotal found before removing duplicates: ", extractedProducts.length);
 
-  // Remove duplicates from the extractedProducts array
-  await removeDuplicates();
+	// Remove duplicates from the extractedProducts array
+	await removeDuplicates();
 
-  // Log the accumulated extracted product information after removing duplicates
-  console.log(extractedProducts);
-  console.log("\nTotal products after removing duplicates: ", extractedProducts.length);
+	// Log the accumulated extracted product information after removing duplicates
+	console.log("\nTotal products after removing duplicates: ", extractedProducts.length);
 
-  // Close the browser after all categories have been scraped
-  await browser.close();
+	// Close the browser after all categories have been scraped
+	await browser.close();
 
-  // Add the "mercado" property to each product
-  extractedProducts = addProductDetails(extractedProducts);
-  console.log(extractedProducts);
+	// Add the "mercado" property to each product
+	extractedProducts = addProductDetails(extractedProducts);
+	//console.log(extractedProducts);
+	console.log("\n FINISHED SCRAPING OK ✅");
 
+	console.log("\n preparing upload... \n \n");
+
+	// Limit the number of products to be uploaded (13 products) and call compareAndSaveToDatabase
+	if (extractedProducts.length > 0) {
+		//const productsToUpload = extractedProducts.slice(0, 5000);
+		const i = 1;
+
+		const client = await connectToDatabase();
+		compareAndSaveToDatabase(extractedProducts, client, "Angeloni", 5000);
+		console.log("\n\n FINISHED ✅✅✅ \n \n");
+
+	}
+    process.exit(0);
 
 })();
