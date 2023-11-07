@@ -2,38 +2,6 @@ const {getDate} = require("./getdate.js");
 const {saveToMongoDB} = require("./database.js");
 const {connectToDatabase} = require("./database.js");
 
-async function fetchProducts() {
-
-	try {
-		let mercadoName = "Cooper Água Verde"
-
-		console.log("\n\n runnin fetchAndLogProducts() \n\n\n");
-
-		const client = await connectToDatabase();
-
-		const db = client.db("products");
-		const collection = db.collection("products");
-
-
-		// é o Cooper Água Verde dando problema duplicando os produtos
-
-		// Fetch all products from the database, filtered by Mercado
-		const products = await collection.find({mercado: mercadoName}).toArray();
-
-
-		console.log("\n\nProducts in the database: \n");
-	
-		console.log("\n\n 🅱 Products in the database: ", products.length, "\n\n");
-
-
-		// Close the MongoDB connection when done
-		client.close();
-	} catch (error) {
-		console.error("Error:", error);
-	}
-}
-
-//fetchProducts();   //test function
 
 let mercadosAvailable = ["Bistek", "Angeloni", "Fort", "Giassi", "atacadao", "Cooper Água Verde"]
 
@@ -103,9 +71,101 @@ async function compareAndSaveToDatabase(newlyScrapedProducts, client, mercadoNam
 		await saveToMongoDB(client, limitedProductsToUpload);
 		console.log("MongoDB documents have been uploaded.");
 
+
+		async function storeScrapingResultsToDatabase(client) {
+			const db = client.db("products");
+			const collection = db.collection("scrapingResults");
+		
+			// Create a document with the total counts
+			const result = await collection.insertOne({
+			  date: new Date(),
+			  scraped: newlyScrapedProducts.length,
+			  pricesUpdated: productsWithDifferentPrices.length,
+			  mercado: mercadoName
+			});
+			console.log("uploaded results to mongoDB ☑☑");
+		
+		}
+
+
+			await storeScrapingResultsToDatabase(client)
+
+
+
+
+
+
+
+
 	} else {
 		console.log("No products with different prices to save to MongoDB 🐬 ");
 	}
+
+
+	
 }
 
 module.exports = {compareAndSaveToDatabase};
+
+
+
+
+
+
+async function storeScrapingResultsToDatabase(client, totalScraped, totalPriceUpdated, totalNewSaved) {
+	try {
+	  const db = client.db("products");
+	  const collection = db.collection("scrapingResults");
+  
+	  // Create a document with the total counts
+	  const result = await collection.insertOne({
+		date: new Date(),
+		totalScrapedProducts: totalScraped,
+		totalPriceUpdatedProducts: totalPriceUpdated,
+		totalNewProductsSaved: totalNewSaved,
+	  });
+  
+	  console.log("Scraping results stored in the database.");
+	} catch (error) {
+	  console.error("Error storing scraping results:", error);
+	}
+  }
+
+
+
+
+
+
+
+//test function
+async function fetchProducts() {
+
+	try {
+		let mercadoName = "Cooper Água Verde"
+
+		console.log("\n\n runnin fetchAndLogProducts() \n\n\n");
+
+		const client = await connectToDatabase();
+
+		const db = client.db("products");
+		const collection = db.collection("products");
+
+
+		// é o Cooper Água Verde dando problema duplicando os produtos
+
+		// Fetch all products from the database, filtered by Mercado
+		const products = await collection.find({mercado: mercadoName}).toArray();
+
+
+		console.log("\n\nProducts in the database: \n");
+	
+		console.log("\n\n 🅱 Products in the database: ", products.length, "\n\n");
+
+
+		// Close the MongoDB connection when done
+		client.close();
+	} catch (error) {
+		console.error("Error:", error);
+	}
+}
+//fetchProducts();   //test function

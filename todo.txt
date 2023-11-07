@@ -1,6 +1,8 @@
 ❌  pegar todos os links de categorias do Giassi  (13/300)
 ❌  adicionar preco promocional Cooper agua verde
 ❌  add db scraping and upload results to mongoDB
+❌  add vps ip to mongodb access manager
+
 
 
 ✅   usar getDate em todos

@@ -1,5 +1,5 @@
 async function connectToDatabase() {
-	console.log("Connecting.........");
+	console.log("Connecting to db.........\n");
 
 	const {MongoClient} = require("mongodb");
 	let passwordMongoDB = "E0eeRkr6oqWd9Ir9";
@@ -7,7 +7,7 @@ async function connectToDatabase() {
 
 	const client = new MongoClient(uri);
 	await client.connect();
-	console.log("Connected to MongoDB Atlas ✅");
+	console.log("Connected to MongoDB Atlas ✅\n");
 	return client;
 }
 
