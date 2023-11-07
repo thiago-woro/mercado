@@ -11,7 +11,7 @@ let categoriesURLs = [
 	379, 1076,
 ];
 
-categoriesURLs = [1];
+//   categoriesURLs = [1];   //testar nesta categoria
 
 async function setupBrowser() {
 	const browser = await puppeteer.launch({headless: true, slowMo: 0, devtools: false});

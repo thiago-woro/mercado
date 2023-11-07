@@ -3,9 +3,10 @@
 
 ❌  conferir que cada produto obj use campos em comum, com os mesmos nomes. 
 ❌  pegar todos os links de categorias do Giassi  (13/300)
-❌  Adicionar data e mercado em todos os produtos
-❌  adicionar funcao compareAndSaveToDatabase() Fort, angeloni, Cooper
 ❌  adicionar preco promocional Cooper agua verde
+❌  adicionar funcao compareAndSaveToDatabase() Fort, angeloni
+❌  upload Fort
+❌  upload angeloni
 
 
 

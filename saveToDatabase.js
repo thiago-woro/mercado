@@ -1,5 +1,5 @@
 const {getDate} = require("./getdate.js");
-//const {saveToMongoDB} = require("./database.js");
+const {saveToMongoDB} = require("./database.js");
 const {connectToDatabase} = require("./database.js");
 
 async function fetchProducts() {
@@ -35,7 +35,18 @@ async function fetchProducts() {
 
 //fetchProducts();   //test function
 
+let mercadosAvailable = ["Bistek", "Angeloni", "Fort", "Giassi", "atacadao", "Cooper Água Verde"]
+
 async function compareAndSaveToDatabase(newlyScrapedProducts, client, mercadoName, maxProductsToUpload) {
+
+	 // Check if mercadoName is in mercadosAvailable
+	 if (!mercadosAvailable.includes(mercadoName)) {
+		// mercadoName is not in the array, return early or throw an error
+		console.error(`Error: mercadoName "${mercadoName}   " is not available.`);
+		return; 
+	  }
+
+
 	console.log("\n starting saveToDatabase.js");
 	console.log("\n received from SCRAPER ", newlyScrapedProducts.length, " products");
 
@@ -64,7 +75,7 @@ async function compareAndSaveToDatabase(newlyScrapedProducts, client, mercadoNam
 			}))
 		);
  
-		console.log(`${uniqueNewlyScrapedProducts.length} new products created and saved.`);
+		console.log(`${uniqueNewlyScrapedProducts.length} new products created and saved on MongoDB 🐬.`);
 		return;
 	}
 
@@ -89,9 +100,11 @@ async function compareAndSaveToDatabase(newlyScrapedProducts, client, mercadoNam
 	if (productsWithDifferentPrices.length > 0) {
 		// Apply the limit here
 		const limitedProductsToUpload = productsWithDifferentPrices.slice(0, maxProductsToUpload);
-		//await saveToMongoDB(client, limitedProductsToUpload);
+		await saveToMongoDB(client, limitedProductsToUpload);
+		console.log("MongoDB documents have been uploaded.");
+
 	} else {
-		console.log("No products with different prices to save to MongoDB");
+		console.log("No products with different prices to save to MongoDB 🐬 ");
 	}
 }
 
